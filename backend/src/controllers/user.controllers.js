@@ -5,37 +5,42 @@ import generateToken from "../utils/generateToken.js";
 
 const registerUser = asyncHandler(async (req, res, next) => {
     const { name, email, password } = req.body;
-    console.log(req.body);
 
-    const existingUser = await User.findOne({ email });
+    try {
+        const existingUser = await User.findOne({ email });
 
-    if (existingUser) {
-        res.status(400);
-        throw new Error("User already exists");
-    }
+        if (existingUser) {
+            res.status(400);
+            throw new Error("User already exists");
+        }
 
-    const user = await User.create({
-        name,
-        email,
-        password,
-    });
-
-    if (user) {
-        //generate Token
-        generateToken(res, user._id);
-        res.status(202).json({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            isAdmin: user.isAdmin,
+        const user = await User.create({
+            name,
+            email,
+            password,
         });
-    } else {
-        res.status(400);
-        throw new Error('Invalid User data');
+
+        if (user) {
+            //generate Token
+            generateToken(res, user._id);
+            res.status(202).json({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                isAdmin: user.isAdmin,
+            });
+        } else {
+            res.status(400);
+            throw new Error('Invalid User data');
+        }
+    } catch (error) {
+res.status(500).json({ message: "Something went wrong" });
     }
+
+
 });
 
-const authUser = asyncHandler(async (req, res, next) => {
+const authUser = asyncHandler(async (req, res   ) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router"
 import { useRegisterUserMutation } from "../slice/userSlice";
@@ -15,7 +15,6 @@ const SignupPage = () => {
 
 
     const { userInfo } = useSelector((state) => state.auth);
-    console.log(userInfo);
     const [registerUser] = useRegisterUserMutation();
 
     const HandleRegister = async (e) => {
@@ -28,6 +27,12 @@ const SignupPage = () => {
             toast.error(error?.data?.message || error.error);
         }
     }
+
+    useEffect(()=>{
+        if(userInfo){
+            navigate('/');
+        }
+    },[userInfo,navigate]);
 
     return (
         <>
@@ -60,10 +65,6 @@ const SignupPage = () => {
                         <div className="w-full flex-auto justify-center content-center items-center lg:w-1/2 px-6 py-8">
                             <div className="text-center">
                                 <h1 className="text-2xl font-bold sm:text-3xl text-[#ffffff]">Join Us Today! <br />Create Your Account</h1>
-                                <p className="mt-4 text-[#adadad]">
-                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Et libero nulla eaque error neque ipsa
-                                    culpa autem, at itaque nostrum!
-                                </p>
                             </div>
 
                             <form onSubmit={HandleRegister} className="mt-8 space-y-4">
