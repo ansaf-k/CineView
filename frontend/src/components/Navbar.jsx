@@ -1,27 +1,45 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
-import {Menu, Search, X, User, UserPen, Inbox, LogOut } from "lucide-react";
-import { useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { Search, X, User, UserPen, Inbox, LogOut } from "lucide-react";
+import { Menu as LucideMenu } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
 import {
-  Menu,
+  Menu as MTMenu,
   MenuHandler,
   MenuList,
   MenuItem,
   Button,
   Typography,
 } from "@material-tailwind/react";
+import { useLogoutMutation } from "../slice/userSlice";
+import { Logout } from "../slice/authSlice";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
 
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const inputRef = useRef(null);
+  const [logoutApiCall] = useLogoutMutation()
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const { userInfo } = useSelector((state) => state.auth);
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!isMobileMenuOpen);
   };
+
+
+  const logoutHandler = async () => {
+    try {
+      await logoutApiCall().unwrap();
+      dispatch(Logout()); //removes localstorage data
+      navigate('/login');
+    } catch (error) {
+      toast.error(error?.data?.message);
+    }
+  }
 
   // Close search input when clicking outside
   useEffect(() => {
@@ -79,18 +97,18 @@ const Navbar = () => {
             </div>
 
             {/* Profile Button */}
-            {userInfo?.data.name ?
-              <Menu
+            {userInfo?.name ?
+              <MTMenu
                 animate={{
                   mount: { y: 25 },
                   unmount: { y: 0 },
                 }}>
                 <MenuHandler>
                   <Button className="flex items-center p-2 justify-center rounded-full bg-transparent hover:bg-[#212121] hover:text-[#d53a12] transition duration-300">
-                    <span className="text-[#adadad] pr-1 text-sm font-medium rounded-full">{userInfo.data.name}</span>
-                    <button className="text-[#adadad] ">
+                    <span className="text-[#adadad] pr-1 text-sm font-medium rounded-full">{userInfo.name}</span>
+                    <div className="text-[#adadad] ">
                       <User size={20} />
-                    </button>
+                    </div>
                   </Button>
                 </MenuHandler>
                 <MenuList>
@@ -119,19 +137,19 @@ const Navbar = () => {
                   <MenuItem className="flex items-center gap-2 ">
                     <LogOut className="h-5 w-5" color="#adadad" />
 
-                    <Typography variant="small" className="font-medium hover:text-[#d53a12] transition-all duration-200">
+                    <Typography onClick={logoutHandler} variant="small" className="font-medium hover:text-[#d53a12] transition-all duration-200">
                       Sign Out
                     </Typography>
                   </MenuItem>
                 </MenuList>
-              </Menu>
-              : <button className="p-2 rounded-full text-[#adadad] hover:bg-[#212121] transition">
+              </MTMenu>
+              : <button onClick={() => navigate('/login')} className="p-2 rounded-full text-[#adadad] hover:bg-[#212121] transition">
                 <User size={20} />
               </button>}
 
             {/* Mobile Menu Button */}
-            <button onClick={toggleMobileMenu} className="md:flex text-[#adadad] hover:text-[#d53a12] p-2 transition">
-              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            <button onClick={toggleMobileMenu} className="md:hidden text-[#adadad] hover:text-[#d53a12] p-2 transition">
+              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <LucideMenu className="h-6 w-6" />}
             </button>
           </div>
         </div>

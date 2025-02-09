@@ -111,7 +111,7 @@ const LoginPage = () => {
             {/* Image Section */}
             <div className="relative w-full lg:w-1/2">
               <img
-                alt="Banner signu"
+                alt="Banner signup"
                 src="../src/assets/theatre.jpeg"
                 className="absolute inset-0 brightness-50 h-full w-full object-cover rounded-r-lg"
               />
